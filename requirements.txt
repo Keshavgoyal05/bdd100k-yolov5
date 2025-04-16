@@ -1,0 +1,16 @@
+# requirements.txt
+numpy
+pandas
+matplotlib
+seaborn
+opencv-python
+scikit-learn
+pycocotools
+jupyterlab
+streamlit
+tqdm
+requests
+pyyaml
+tensorflow
+urllib3<2.0
+tensorboard

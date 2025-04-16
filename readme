@@ -1,0 +1,105 @@
+# 🚗 BDD100K Object Detection with YOLOv5
+
+
+I chose YOLOv5 for this project because it is a highly efficient and widely-used object detection model, particularly well-suited for tasks like autonomous driving. Here's a detailed explanation:
+
+### Why YOLOv5?
+
+- **Speed and Efficiency**: YOLOv5 is optimized for real-time object detection, making it ideal for autonomous driving scenarios where quick decision-making is critical.
+- **Ease of Use**: YOLOv5 has a user-friendly implementation with PyTorch, making it easier to train, fine-tune, and deploy compared to other models.
+- **Performance**: YOLOv5 achieves a good balance between accuracy and speed, which is crucial for large-scale datasets like BDD100K that contain diverse scenes and objects.
+
+### How YOLOv5 Works Better Here
+
+- **Real-Time Detection**: Autonomous driving requires real-time object detection to identify vehicles, pedestrians, and other objects. YOLOv5's architecture is designed for high-speed inference.
+- **Scalability**: YOLOv5 supports multiple model sizes (e.g., YOLOv5s, YOLOv5m, YOLOv5l), allowing you to choose a model that fits your hardware constraints while maintaining performance.
+- **Pretrained Weights**: YOLOv5 provides pretrained weights on COCO, which can be fine-tuned on BDD100K, reducing training time and improving accuracy.
+
+### Top 3 Models for This Project
+
+1. **YOLOv5**: As discussed, it is fast, accurate, and easy to use, making it the top choice for this project.
+2. **EfficientDet**: Known for its scalability and high accuracy, EfficientDet could be a good alternative. However, it is generally slower than YOLOv5, which might not be ideal for real-time applications.
+3. **Faster R-CNN**: This model is highly accurate and works well for complex datasets like BDD100K. However, it is computationally expensive and slower, making it less suitable for real-time scenarios.
+
+### Why Not Another Model?
+
+- **YOLOv4**: While YOLOv4 is also efficient, YOLOv5 offers better ease of use, improved performance, and a more streamlined training pipeline.
+- **SSD (Single Shot Detector)**: SSD is fast but generally less accurate than YOLOv5, especially for detecting small objects in diverse scenes.
+- **Faster R-CNN**: As mentioned, it is slower and more resource-intensive, which is not ideal for real-time autonomous driving tasks.
+
+In summary, YOLOv5 strikes the right balance between speed, accuracy, and usability, making it the best choice for your project. Other models like EfficientDet or Faster R-CNN could work but may not meet the real-time requirements or ease of implementation that YOLOv5 provides.
+
+This project contains the full training, evaluation, inference, and TensorBoard workflow for object detection using the YOLOv5 model on the BDD100K dataset.
+
+---
+
+## 🔧 Commands Overview
+
+### 🏋️ Train
+
+```bash
+python yolov5/train.py --img 640 --batch 16 --epochs 5 \
+  --data training/bdd100k.yaml \
+  --weights yolov5/yolov5s.pt \
+  --name yolo_bdd100k_result \
+  --project results
+```
+
+### 📊 Evaluate
+
+```bash
+python yolov5/val.py \
+  --weights results/yolo_bdd100k_result/weights/best.pt \
+  --data training/bdd100k.yaml \
+  --img 640 \
+  --project results \
+  --name eval_yolo_bdd100k \
+  --save-txt \
+  --save-conf
+```
+
+### 🔍 Inference
+
+```bash
+python yolov5/detect.py \
+  --weights results/yolo_bdd100k_result/weights/best.pt \
+  --img 640 \
+  --conf 0.50 \
+  --source data/bdd100k_images_100k/bdd100k/images/100k/test \
+  --project results \
+  --name infer_yolo_bdd100k \
+  --save-txt \
+  --save-conf
+```
+
+### 📈 TensorBoard
+
+```bash
+tensorboard --logdir results/yolo_bdd100k_result/
+```
+
+Then open in your browser: http://localhost:6006
+
+---
+
+## 📁 Folder Structure
+
+```
+.
+├── yolov5/                   # YOLOv5 repo
+├── analysis/                 # analysis of training data and its readme is stored in analysis folder
+  ├── readme                  # separate readme is there for analysis module.
+├── training/                 # Data preparation for yolo + YAML config for BDD100K dataset
+├── data/                     # train + val data (images and labels)
+├── results/                  # Output results from training, eval, inference
+└── readme                    # This file
+```
+
+---
+
+## 📦 Notes
+
+- I trained on 1 epochs for quick testing. For full training, use `--epochs 30` or more.
+- Update `epochs` as needed for full training.
+- Adjust `--img`, `--batch`, `--conf` for tuning performance.
+- `--save-txt` and `--save-conf` are useful for tracking predictions.

@@ -1,0 +1,170 @@
+# BDD100K Object Detection - Data Analysis Experiments
+
+This document outlines all recommended data analysis types for the BDD100K dataset (object detection task), what each analysis includes, what insights can be gained from it, and how these insights can guide model design, training, evaluation, and deployment.
+
+---
+
+## 1. Class Distribution Analysis
+**What:** Count the number of annotations for each object detection category (e.g., car, person, traffic light).
+
+**Why:** To detect class imbalance and understand which objects are underrepresented.
+
+**Impact:**
+- Use weighted loss functions or resampling techniques.
+- Choose models that are robust to imbalance (e.g., focal loss).
+- Focus evaluation on per-class performance (e.g., per-class mAP).
+
+---
+
+## 2. Image-Level Attribute Distribution
+**What:** Analyze distribution of scene-level attributes:
+- `weather`: (clear, rainy, overcast, etc.)
+- `scene`: (highway, city street, etc.)
+- `timeofday`: (daytime, nighttime, dawn/dusk)
+
+**Why:** To identify any environmental bias in the dataset.
+
+**Impact:**
+- Apply augmentation strategies to simulate underrepresented conditions.
+- Evaluate model robustness under various real-world scenarios.
+- Fine-tune models for domain adaptation if required.
+
+---
+
+## 3. Object Occlusion and Truncation
+**What:** Calculate frequency of occluded and truncated objects in the dataset.
+
+**Why:** To measure how often the detector must handle incomplete object appearances.
+
+**Impact:**
+- Choose architectures that are strong in partial detection (e.g., DETR, Swin Transformer).
+- Include occlusion-aware augmentations (e.g., CutOut, random crops).
+- Assess model performance separately for occluded/truncated objects.
+
+---
+
+## 4. Bounding Box Size and Aspect Ratio
+**What:** Analyze the size (area) and aspect ratio (width/height) of bounding boxes.
+
+**Why:** Understand object scale and shape variation across classes.
+
+**Impact:**
+- Adjust anchor box dimensions in models like YOLO, SSD.
+- Use multi-scale training and input resizing.
+- Choose architectures that handle small objects effectively.
+
+---
+
+## 5. Bounding Box Position Distribution
+**What:** Analyze where objects appear spatially in the image (top/bottom, left/right).
+
+**Why:** Some object types may follow consistent spatial priors (e.g., traffic lights at the top).
+
+**Impact:**
+- Use position-aware data augmentation.
+- Avoid inappropriate augmentations (e.g., flipping traffic signs).
+- Model-aware augmentation: You might choose to avoid flipping traffic lights if they’re always at the top.
+- Detection priors: Helps you understand where anchors or attention should focus.
+- Scene bias: Useful for bias detection — e.g., if cars are only seen in the center, your model might fail on corner cases.
+
+---
+
+## 6. Object Co-occurrence Matrix
+**What:** Analyze how often different object categories appear together in images.
+
+**Why:** Objects often appear in real-world contextual groupings.
+
+**Impact:**
+- Use contextual learning models.
+- Analyze performance drop when multiple objects co-occur.
+- Model design : Consider models that use relational/contextual information (e.g., DETR)
+- Data sampling : Choose representative subset for faster prototyping
+- Error analysis : Detect if performance drops when certain objects co-occur
+- Consider gradient accumulation if many dense images slow training
+- Use tiling/cropping for very dense images
+
+
+---
+
+## 7. Object Density (Per Image)
+**What:** Measure number of labeled objects per image.
+
+**Why:** Indicates how crowded scenes are.
+
+**Impact:**
+- Tune NMS thresholds or crowd handling in models.
+- Modify batch/image size for dense object scenarios.
+- Model Selection : Models like YOLO or RetinaNet perform differently on sparse vs. dense scenes
+- Training Strategy : Dense images may require smaller batch sizes or tiling
+- Evaluation Insight : Failures in high-density images can signal issues with NMS (non-max suppression), object overlap handling, etc.
+- Data Augmentation : Overcrowded images may require careful augmentations (cutmix, mosaic, etc.)
+
+
+---
+
+## 8. Rare Object / Edge Case Identification
+**What:** Identify rare objects, edge-case conditions (e.g., night + rain + occlusion).
+
+**Why:** Rare samples are often failure points for models.
+
+**Impact:**
+- Stress-test models.
+- Use curriculum learning or augment edge cases.
+
+---
+
+## 9. Train vs Validation Split Comparison
+**What:** Compare class and attribute distributions between train and val splits.
+
+**Why:** Ensure consistency and fairness in evaluation.
+
+**Impact:**
+- Rebalance splits if bias exists.
+- Perform stratified sampling or k-fold if needed.
+
+---
+
+## 10. Attribute Correlation with Model Performance (Post-training)
+**What:** Correlate model accuracy with weather, scene, and time of day.
+
+**Why:** Helps explain where models fail or succeed.
+
+**Impact:**
+- Guide data collection.
+- Improve augmentation strategies.
+- Assist in model debugging.
+
+---
+
+## 11. Annotation Quality Check
+**What:** Detect misaligned, missing, or noisy annotations.
+
+**Why:** Label noise impacts model learning.
+
+**Impact:**
+- Improve label quality via heuristics or manual review.
+- Consider semi-supervised cleaning tools.
+
+---
+
+## Summary Table
+| Analysis Type                    | Insight Provided                        | Impact on Model/Training                      |
+|----------------------------------|-----------------------------------------|------------------------------------------------|
+| Class Distribution               | Imbalance detection                     | Weighted loss, sampling, per-class mAP         |
+| Image Attributes                 | Environment bias                        | Augmentation, robustness evaluation            |
+| Occlusion/Truncation             | Complexity of object visibility         | Architecture, occlusion-aware training         |
+| BBox Size/Aspect Ratio           | Object scale analysis                   | Anchor tuning, multi-scale design              |
+| BBox Position                    | Positional priors                       | Spatial data handling                          |
+| Object Co-occurrence             | Contextual relationships                | Context-aware modeling                         |
+| Object Density                   | Scene clutter level                     | NMS tuning, batch/image strategy               |
+| Rare Samples                     | Edge-case difficulty                    | Hard sample mining, curriculum learning        |
+| Train vs Val Comparison          | Evaluation fairness                     | Stratified sampling                            |
+| Attribute vs Performance         | Weakness analysis                       | Targeted improvement                           |
+| Annotation Quality               | Label reliability                       | Better supervision, potential label fixes      |
+
+---
+
+This analysis pipeline forms the foundation for a robust object detection system. Each insight directly feeds into smarter architectural decisions, training strategies, and evaluation procedures.
+
+As of now i have just wrote code for different analysis methods in analysis/analysis.ipynb ans saved all plots 
+under analysis/plots folder.

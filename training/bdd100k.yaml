@@ -1,0 +1,5 @@
+train: ../data/bdd_yolo/train/images
+val: ../data/bdd_yolo/val/images
+
+nc: 10
+names: ['pedestrian', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle', 'traffic light', 'traffic sign']

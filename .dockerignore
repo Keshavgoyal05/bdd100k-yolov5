@@ -1,0 +1,6 @@
+# .dockerignore
+.venv
+.DS_Store
+results/infer_yolo_bdd100k/
+results/eval_yolo_bdd100k
+__pycache__/
